@@ -1,0 +1,43 @@
+%
+
+G02 X3.0 Y2.0 I1.0 J0.0 (Clockwise circular interpolation with a radius of 1 unit and a center at (2, 2))
+ 
+G02 X4.0 Y4.0 I0.0 J-1.0 (Circular interpolation with a smaller radius)
+ 
+G02 X8.0 Y6.0 I2.0 J4.0 (Circular interpolation with a larger radius and a different center)
+
+G02 X9.0 Y9.0 I0.0 J-4.0 (A more significant circular interpolation with a center at (5, 5))
+ 
+G02 X10.0 Y6.0 I0.0 J2.0 (A circular movement with a radius of 2 units)
+ 
+G02 X13.0 Y9.0 I0.0 J3.0 (Circular interpolation with a radius of 3 units)
+
+G02 X8.0 Y5.0 I-1.0 J0.0 (A smaller circular movement with a center at (7, 5))
+ 
+G02 X14.0 Y10.0 I0.0 J0.0 (A clockwise circle with a center at (12, 10))
+ 
+G02 X7.0 Y4.0 I0.0 J0.0 (A circular interpolation with a center at (6, 4))
+ 
+G02 X9.0 Y6.0 I0.0 J-2.0 (A clockwise circular move with a radius of 2 units)
+ 
+G02 X9.0 Y7.0 I0.0 J-1.0 (A smaller circular interpolation with a center at (8, 7))
+ 
+G02 X12.0 Y11.0 I0.0 J-4.0 (Circular interpolation with a radius of 4 units)
+ 
+G02 X6.0 Y5.0 I-2.0 J0.0 (A clockwise circle with a center at (4, 5))
+ 
+G02 X17.0 Y8.0 I2.0 J0.0 (A larger circular move with a center at (15, 8))
+
+G02 X18.0 Y5.0 I3.0 J0.0 (Circular interpolation with a radius of 5 units and a different center)
+
+G02 X2.0 Y3.0 (Incorrect G2 command format (missing required parameters))
+
+G02 X4.0 Y4.0 I0.0 J-1.0 (Negative radius specified)
+
+G2 Y5.0 I2.0 J2.0 (Missing X parameter)
+
+G2 X6.0 Y6.0 I0.0 J0.0 (Zero radius (invalid for circular interpolation))
+
+G2 X7.0 Y7.0 I-1.0 J0.0 (Invalid G2 command (using G2 for counterclockwise interpolation))
+
+%
