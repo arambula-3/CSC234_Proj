@@ -76,7 +76,7 @@ int main(void) //int argc, char *argv[]
                 if (check == 0) {
                     printf("improper proper code inputted at line = %d\n\n", count);
                     fprintf(fp, "improper proper code inputted at line = %d\n\n", count); 
-                    continue;
+                    break;
                 }
                 //Printed out the parsed data
                 printf("x= %s\n", x_pos);
@@ -94,13 +94,27 @@ int main(void) //int argc, char *argv[]
                 break;
             } else {
                 printf("improper proper code inputted at line = %d\n\n", count);
-                fprintf(fp, "improper proper code inputted at line = %d\n\n", count);  
+                fprintf(fp, "improper proper code inputted at line = %d\n\n", count);
+                break;  
             }
         }
     }
     fclose(ptr);
     fclose(fp);
     return 0;
+}
+
+//checks a string to see if it is a float
+//returns 1 if string is a float
+//return 0 if string is not a float
+int num_check(char *num_str) {
+    float num;
+    int check = sscanf(num_str, "%f", &num);
+    if (check == 1) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 //gcode = Gcode passed in
@@ -136,6 +150,12 @@ int gcode_parse(char *gcode, char *coords[], int len) {
             }
             char *temp = coords[i];
             ret[i] = temp+1;
+
+            if (num_check(ret[i]) != 1) {
+                check = 0;
+                break;
+            }
+
             //change X's coordinates if necessary
             if (track == 0) {
                 strcpy(x_pos, ret[i]);
