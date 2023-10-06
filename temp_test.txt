@@ -1,8 +1,23 @@
 %
-G00 X1 Y2
-G00 X5 Y3 Z-1
-G00 Y4.4
-G00 Z-7
-G00 X6
-G00 Y8 Z-9.9
+(This comment should not error);
+G00 X1 Y2 (no error);
+G00 X5 Y3 Z-1. (no error);
+g0 z4 G00 x7; (error);
+G0 X.3 (no error);
+G00 X (error);
+G00 Y4.4 (no error);
+G00 Yh (error);
+G00 Z -19.0 (no error);
+g00 x52. Y 36. (no error);
+g00 x27. Y 83. z916 (no error);
+g0 x78. Y 63. z 42 (no error); 
+G0 x 31. Y 93. (no error);
+G00 Z-7. (no error);
+G00 X6. (no error);
+X34 Y67. (this should not be an error but it still is); 
+G00 Z56 X97 (no error); 
+G00 Y8 Z-9.9 (no error);
+G00 A36 (error);
+g00 Y74 (no error);
+g0 z28 (no error);
 %
