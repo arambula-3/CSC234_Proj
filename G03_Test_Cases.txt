@@ -11,5 +11,4 @@ G03 X 25 Y 15 I -10 J 0 (This should not be an error)
 G03 X-10 Y-10 I0 J10(This command defines a clockwise circular motion with a center at X=-10, Y=0, and a radius of 10 units)
 G03 X20 Y0 I0 J-20(This command Specifies a clockwise circular motion with a center at X=20, Y=-20, and a radius of 20 units)
 X20 Y0 I0 J-20(This command should not be an error)
-
 %
