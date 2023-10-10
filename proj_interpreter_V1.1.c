@@ -23,14 +23,14 @@ int main(void) //int argc, char *argv[]
     int count = 0;
 
     //Will need to change file path to your own local temporary text test file
-    ptr = fopen("C:/Users/rkolagotla/Downloads/temp_test.txt", "r");
+    ptr = fopen("../temp_test.txt", "r");
 
     if (NULL == ptr) {
         printf("No file detected \n");
     }
 
     //output text filepath
-    char *filename = "C:/Users/rkolagotla/Downloads/output.txt";
+    char *filename = "../output.txt";
 
     //output file for writing
     FILE *fp = fopen(filename, "w");
@@ -90,13 +90,13 @@ int main(void) //int argc, char *argv[]
                 //split rest of command string and put into "rest_token"
                 while(token != NULL) {
                     //if we are in a comment ignore the string tokens
-                    if (strstr(token, "(") != NULL) {
+                    if (strstr(token, "(") != NULL && strstr(token, ")") == NULL) {
                         in_comment = 1;
-                        break;
+                        token = strtok(NULL, " ");
                     //finds end of comment and changes in_comment to 0 to signal out of comment
-                    } else if (strstr(token, ")") != NULL) {
+                    } else if (strstr(token, ")") != NULL && strstr(token, "(") == NULL) {
                         in_comment = 0;
-                        break;
+                        token = strtok(NULL, " ");
                     //checks to see if there is a space between a coordinate and its value
                     //for example = "X 36"
                     //if there is a space it will concatenate those 2 token strings "X36"
@@ -113,12 +113,23 @@ int main(void) //int argc, char *argv[]
                         rest_token[index] = token;
                         index = index + 1;
                         token = strtok(NULL, " ");
-                    } else if (in_comment == 0) {
+                    //if not in comment then add values to rest_token
+                    } else if (in_comment == 0 && strstr(token, "(") == NULL && strstr(token, ")") == NULL) {
                         rest_token[index] = token;
                         index = index + 1;
                         token = strtok(NULL, " ");
+                    } else {
+                        token = strtok(NULL, " ");
                     }
                 }
+
+                //Check to see if comments were closed correctly
+                if (in_comment == 1) {
+                    printf("improper comment at line = %d\n\n", count);
+                    fprintf(fp, "improper comment at line = %d\n\n", count); 
+                    break;
+                }
+
                 int len = index;
                 index = 0;
                 int check = gcode_parse(gcode, rest_token, len);
@@ -127,8 +138,9 @@ int main(void) //int argc, char *argv[]
                 if (check == 0) {
                     printf("improper proper code inputted at line = %d\n\n", count);
                     fprintf(fp, "improper proper code inputted at line = %d\n\n", count); 
-                    break;
+                    //break;
                 }
+
                 //Printed out the parsed data
                 printf("x= %s\n", x_pos);
                 fprintf(fp, "x= %s\n", x_pos); 
@@ -154,14 +166,32 @@ int main(void) //int argc, char *argv[]
                 }
             //stop interpreter if end of file token "%" seen
             } else if (strcmp(token, "%") == 0) {
-                break;
-            //checks to see if line is just a comment and then ignores it
+                //break;
+            //checks to see if line is just a comment and that it is closed properly
             } else if (strstr(token, "(") != NULL) {
+                int in_comment = 1; //tracker for if we are in a comment. 0 means not in a comment. 1 means in a comment.
+                if (strstr(token, ")") != NULL && strstr(token, ";") != NULL) {
+                    in_comment = 0;
+                }
+                token = strtok(NULL, " ");
+                //check for closed parenthesis
+                while (token != NULL) {
+                    if (strstr(token, ")") != NULL) {
+                        in_comment = 0;
+                    }
+                    token = strtok(NULL, " ");
+                }
+                //checks to see that comment closed properly
+                if (in_comment == 1) {
+                    printf("improper comment at line = %d\n\n", count);
+                    fprintf(fp, "improper comment at line = %d\n\n", count);
+                    //break;
+                }
                 continue;
             } else {
                 printf("improper proper code inputted at line = %d\n\n", count);
                 fprintf(fp, "improper proper code inputted at line = %d\n\n", count);
-                break;  
+                //break;  
             }
         }
     }
@@ -193,9 +223,112 @@ int gcode_parse(char *gcode, char *coords[], int len) {
     static char *ret[7];
     int check = 0;
     //if statement for handling "G00" codes only
-    if (strcmp(gcode, "G00") == 0 || strcmp(gcode, "G0") == 0 || strcmp(gcode, "g0") == 0 || strcmp(gcode, "g00") == 0 ||
-        strcmp(gcode, "G01") == 0 || strcmp(gcode, "G1") == 0 || strcmp(gcode, "g1") == 0 || strcmp(gcode, "g01") == 0 ||
-        strcmp(gcode, "G02") == 0 || strcmp(gcode, "G2") == 0 || strcmp(gcode, "g2") == 0 || strcmp(gcode, "g02") == 0 ||
+    if (strcmp(gcode, "G00") == 0 || strcmp(gcode, "G0") == 0 || strcmp(gcode, "g0") == 0 || strcmp(gcode, "g00") == 0 ) {
+        for (int i = 0; i < len; i++) {
+            int track;
+            //Check to see that X coordinates are passed in
+            if ((*coords[i] == 88) || (*coords[i] == 120)) {
+                check = 1;
+                track = 0;
+            //Check to see that Y coordinates are passed in
+            } else if ((*coords[i] == 89) || (*coords[i] == 121)) {
+                check = 1;
+                track = 1;
+            //Check to see that Z coordinates are passed in 
+            } else if ((*coords[i] == 90) || (*coords[i] == 122)) {
+                check = 1;
+                track = 2;
+            } else {
+                check = 0;
+                break;
+            }
+            char *temp = coords[i];
+            ret[i] = temp+1;
+
+            //checks to see if token had a ";" attached to it
+            //if it does it is removed
+            if (strstr(ret[i], ";") != NULL) {
+                char test[BUFFERSIZE] = "n/a";
+                strcpy(test, ret[i]);
+                test[strlen(ret[i])-1] = '\0';
+                ret[i] = test;
+            }
+
+            //calls num_check function to see if token is a valid float value
+            if (num_check(ret[i]) != 1) {
+                check = 0;
+                //break;
+            }
+
+            //change X's coordinates if necessary
+            if (track == 0) {
+                strcpy(x_pos, ret[i]);
+            //change Y's coordinates if necessary
+            } else if (track == 1) {
+                strcpy(y_pos, ret[i]);
+            //change Z's coordinates if necessary
+            } else if (track == 2) {
+                strcpy(z_pos, ret[i]);
+            //change F's coordinates if necessary
+            } 
+        }
+    //if statement for handling "G01" codes only
+    } else if (strcmp(gcode, "G01") == 0 || strcmp(gcode, "G1") == 0 || strcmp(gcode, "g1") == 0 || strcmp(gcode, "g01") == 0) {
+        for (int i = 0; i < len; i++) {
+            int track;
+            //Check to see that X coordinates are passed in
+            if ((*coords[i] == 88) || (*coords[i] == 120)) {
+                check = 1;
+                track = 0;
+            //Check to see that Y coordinates are passed in
+            } else if ((*coords[i] == 89) || (*coords[i] == 121)) {
+                check = 1;
+                track = 1;
+            //Check to see that Z coordinates are passed in 
+            } else if ((*coords[i] == 90) || (*coords[i] == 122)) {
+                check = 1;
+                track = 2;
+            } else if ((*coords[i] == 70) || (*coords[i] == 102)) {
+                check = 1;
+                track = 3;
+            } else {
+                check = 0;
+                break;
+            }
+            char *temp = coords[i];
+            ret[i] = temp+1;
+
+            //checks to see if token had a ";" attached to it
+            //if it does it is removed
+            if (strstr(ret[i], ";") != NULL) {
+                char test[BUFFERSIZE] = "n/a";
+                strcpy(test, ret[i]);
+                test[strlen(ret[i])-1] = '\0';
+                ret[i] = test;
+            }
+
+            //calls num_check function to see if token is a valid float value
+            if (num_check(ret[i]) != 1) {
+                check = 0;
+                //break;
+            }
+
+            //change X's coordinates if necessary
+            if (track == 0) {
+                strcpy(x_pos, ret[i]);
+            //change Y's coordinates if necessary
+            } else if (track == 1) {
+                strcpy(y_pos, ret[i]);
+            //change Z's coordinates if necessary
+            } else if (track == 2) {
+                strcpy(z_pos, ret[i]);
+            //change F's coordinates if necessary
+            } else if (track == 3){
+                strcpy(feed_rate, ret[i]);
+            }
+        }
+    //if statement for handling "G02" and "G03" codes only
+    } else if (strcmp(gcode, "G02") == 0 || strcmp(gcode, "G2") == 0 || strcmp(gcode, "g2") == 0 || strcmp(gcode, "g02") == 0 ||
         strcmp(gcode, "G03") == 0 || strcmp(gcode, "G3") == 0 || strcmp(gcode, "g3") == 0 || strcmp(gcode, "g03") == 0) {
         for (int i = 0; i < len; i++) {
             int track;
@@ -245,7 +378,7 @@ int gcode_parse(char *gcode, char *coords[], int len) {
             //calls num_check function to see if token is a valid float value
             if (num_check(ret[i]) != 1) {
                 check = 0;
-                break;
+                //break;
             }
 
             //change X's coordinates if necessary
@@ -268,8 +401,7 @@ int gcode_parse(char *gcode, char *coords[], int len) {
                 strcpy(k_pos, ret[i]);
             } else if (track == 7) {
                 strcpy(r_pos, ret[i]);
-            }
-            
+            }  
         }
     }
     return check;
