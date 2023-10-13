@@ -1,0 +1,49 @@
+%
+t 10 m6 (no error); 
+t 12 m6 m16 t9 (error);
+s 1000 m4 (no error);
+s54 M04 t5 M16 (error);
+M16 t3 m5 (error);
+m1 m5 (error); 
+m5 m2 (error); 
+g01 z4 x1 (no error);
+m0 (no error);
+m00 (no error);
+M0 (no error);
+M00 (no error);
+m1 (no error);
+m01 (no error);
+M1 (no error);
+M01 (no error);
+m2 (no error);
+m02 (no error);
+M2 (no error);
+M02 (no error);
+m3 (error);
+m03 s40 (no error);
+M3 s 56 (no error);
+M03 S (error);
+m4 S 916 (no error);
+m04 (error);
+M4 S1000 (no error);
+M04 s (error);
+m5 (no error);
+m05 (no error);
+M5 (no error);
+M05 (no error);
+m6 t (error);
+m6 (error)
+m06 T5 (no error);
+M6 t 7 (no error);
+M06 t8 (no error);
+m16 t2 (no error);
+M16 t 9 (no error);
+m16 T3 (no error);
+M16 t (error);
+M30 (no error);
+m30 (no error);
+g0 y9 (no error);
+m06 (error;
+%
+
+
