@@ -1,17 +1,19 @@
-%G01 X10 Y5 Z2 F200 (This command moves the tool to X=10, Y=5, and Z=2 at a feed rate of 200 units per minute.)
-G01 X20 F50 (Move the tool to X=20 while maintaining the current Y and Z positions.)
-G01 Y15 F100 (Move the tool to Y=15 while maintaining the current X and Z positions.)
-G01 Z-3 F150 (Move the tool down 3 units along the Z-axis.)
-G01 X5 Y10 (Simultaneously move the tool to X=5 and Y=10 and missing the Feed Rate.)
-G01 X0.5 Y0.25 F0.1 (Move the tool to X=0.5 and Y=0.25 at a feed rate of 0.1 units per minute.)
-G01 X0 Y0 Z0 (Return the tool to the origin X=0, Y=0, Z=0.)
-G01 X30 Y20 Z-5 F20 (Move the tool to X=30, Y=20, and Z=-5.)
-G01 X10 F500 (Move the tool to X=10 at a feed rate of 500 units per minute.)
-G01 X5 Y5 Z5 F5 (Move the tool to X=5, Y=5, and Z=5 simultaneously.)
-G01 X-2 Y-2 F10 (Move the tool to X=-2 and Y=-2)
-G01 Z10 Move the tool up to Z=10 and missing the Feed rate)
-G01 X25 Y15 Z-2 F100 (Move the tool to X=25, Y=15, and Z=-2.)
-G01 X0.5 Y0.5 Z0.1 F10 (Move the tool to X=0.5, Y=0.5, and Z=0.1)
-G01 X-5 Y-5 Z-5 F100 (Move the tool to X=-5, Y=-5, and Z=-5 at a feed rate of 100 units per minute.)
-X10 Y5 Z2 F200 (Missing G1 code)
-F100 X10 Y5 (Incorrect Sequence)%
+%
+G01 X10 Y5 Z2 F200 (This command moves the tool to X=10, Y=5, and Z=2 at a feed rate of 200 units per minute.);
+G01 X20 F50 (Move the tool to X=20 while maintaining the current Y and Z positions.);
+G01 Y15 F100 (Move the tool to Y=15 while maintaining the current X and Z positions.);
+G01 Z-3 F150 (Move the tool down 3 units along the Z-axis.);
+G01 X5 Y10 (Simultaneously move the tool to X=5 and Y=10 and missing the Feed Rate.);
+G01 X0.5 Y0.25 F0.1 (Move the tool to X=0.5 and Y=0.25 at a feed rate of 0.1 units per minute.);
+G01 X0 Y0 Z0 (Return the tool to the origin X=0, Y=0, Z=0.);
+G01 X30 Y20 Z-5 F20 (Move the tool to X=30, Y=20, and Z=-5.);
+G01 X10 F500 (Move the tool to X=10 at a feed rate of 500 units per minute.);
+G01 X5 Y5 Z5 F5 (Move the tool to X=5, Y=5, and Z=5 simultaneously.);
+G01 X-2 Y-2 F10 (Move the tool to X=-2 and Y=-2);
+G01 Z10 Move the tool up to Z=10 and missing the Feed rate);
+G01 X25 Y15 Z-2 F100 (Move the tool to X=25, Y=15, and Z=-2.);
+G01 X0.5 Y0.5 Z0.1 F10 (Move the tool to X=0.5, Y=0.5, and Z=0.1);
+G01 X-5 Y-5 Z-5 F100 (Move the tool to X=-5, Y=-5, and Z=-5 at a feed rate of 100 units per minute.);
+X10 Y5 Z2 F200 (Move the tool to X=10, Y=5, and Z=2 at a feed rate of 200 units per minute.);
+F100 X10 Y5 (Incorrect Sequence);
+%

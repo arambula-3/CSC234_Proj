@@ -26,7 +26,7 @@ int main(void) //int argc, char *argv[]
     int count = 0;
 
     //Will need to change file path to your own local temporary text test file
-    ptr = fopen("../temp_test.txt", "r");
+    ptr = fopen("../M_Test_Cases.txt", "r");
 
     if (NULL == ptr) {
         printf("No file detected \n");
@@ -91,6 +91,10 @@ int main(void) //int argc, char *argv[]
                     token = concat;
                 }
 
+                char *mcode_token[7];
+                int mcode_count = 0;
+                int mcode_len = 0;
+
                 //split rest of command string and put into "rest_token"
                 while(token != NULL) {
                     //if we are in a comment ignore the string tokens
@@ -109,22 +113,51 @@ int main(void) //int argc, char *argv[]
                         strstr(token, "f") != NULL || strstr(token, "F") != NULL || strstr(token, "I") != NULL ||
                         strstr(token, "i") != NULL || strstr(token, "J") != NULL || strstr(token, "j") != NULL ||
                         strstr(token, "K") != NULL || strstr(token, "k") != NULL || 
-                        strstr(token, "R") != NULL || strstr(token, "r") != NULL) && strlen(token) == 1) {
+                        strstr(token, "R") != NULL || strstr(token, "r") != NULL ||
+                        strstr(token, "t") != NULL || strstr(token, "T") != NULL ||
+                        strstr(token, "s") != NULL || strstr(token, "S") != NULL) && strlen(token) == 1) {
                         char *concat = token;
                         token = strtok(NULL, " "); 
                         strcat(concat, token);
                         token = concat;
-                        rest_token[index] = token;
-                        index = index + 1;
+
+                        //check if argument is spindle speed or tool change
+                        if (strstr(token, "t") != NULL || strstr(token, "T") != NULL ||
+                            strstr(token, "s") != NULL || strstr(token, "S") != NULL) {
+                            mcode_token[mcode_len] = token;
+                            mcode_len = mcode_len + 1;;
+                        } else {
+                            rest_token[index] = token;
+                            index = index + 1;
+                        }
                         token = strtok(NULL, " ");
                     //if not in comment then add values to rest_token
                     } else if (in_comment == 0 && strstr(token, "(") == NULL && strstr(token, ")") == NULL) {
-                        rest_token[index] = token;
-                        index = index + 1;
+                        //check if argument is an M code
+                        if (strstr(token, "m") != NULL || strstr(token, "M") != NULL) {
+                            mcode_token[mcode_len] = token;
+                            mcode_count = mcode_count + 1;
+                            mcode_len = mcode_len + 1;
+                        //check if argument  is a tool change or spindle speed
+                        } else if (strstr(token, "t") != NULL || strstr(token, "T") != NULL ||
+                            strstr(token, "s") != NULL || strstr(token, "S") != NULL) {
+                            mcode_token[mcode_len] = token;
+                            mcode_len = mcode_len + 1;;
+                        } else {
+                            rest_token[index] = token;
+                            index = index + 1;
+                        }
                         token = strtok(NULL, " ");
                     } else {
                         token = strtok(NULL, " ");
                     }
+                }
+
+                //too many M codes on one line check
+                if (mcode_count > 1) {
+                    printf("too many M codes on line = %d\n\n", count);
+                    fprintf(fp, "too many M codes on line = %d\n\n", count);
+                    //break;
                 }
 
                 //Check to see if gcodes from same group are input on the same line
@@ -163,6 +196,34 @@ int main(void) //int argc, char *argv[]
                     //break;
                 }
 
+
+                int m_check = 1;
+                //set spindle speed to 0 if m5 given
+                if (mcode_len == 1 && (strcmp(mcode_token[0], "m05") == 0 || strcmp(mcode_token[0], "m5") == 0 ||
+                    strcmp(mcode_token[0], "M05") == 0 || strcmp(mcode_token[0], "M5") == 0)) {
+                    strcpy(spindle_speed, "0");
+                //call mcode parse for tool change and spindle speed commands
+                } else if (mcode_len == 2) {
+                    char mcode[] = "M";
+                    if (strstr(mcode_token[0],"m") != NULL || strstr(mcode_token[0],"M") != NULL) {
+                        strcat(mcode,mcode_token[0]+1);
+                        strcpy(mcode_token[0], mcode_token[1]);
+                        mcode_len = mcode_len - 1;
+                        m_check = mcode_parse(mcode, mcode_token, mcode_len);
+                    } else if (strstr(mcode_token[1],"m") != NULL || strstr(mcode_token[1],"M") != NULL) {
+                        strcat(mcode,mcode_token[1]+1);
+                        mcode_len = mcode_len - 1;
+                        m_check = mcode_parse(mcode, mcode_token, mcode_len);
+                    }
+                }
+                //Check to see if commands followed proper syntax and form
+                //If not stop and print error
+                if (m_check == 0) {
+                    printf("improper proper code inputted at line = %d\n\n", count);
+                    fprintf(fp, "improper proper code inputted at line = %d\n\n", count); 
+                    //break;
+                }
+
                 //Printed out the parsed data
                 printf("x= %s\n", x_pos);
                 fprintf(fp, "x= %s\n", x_pos); 
@@ -186,6 +247,12 @@ int main(void) //int argc, char *argv[]
                     printf("feed rate= %s\n\n", feed_rate);
                     fprintf(fp, "feed rate= %s\n\n", feed_rate);
                 }
+                //stops if end program M code given
+                if (mcode_len == 1 && (strstr("00102", mcode_token[0]+1) != NULL || strcmp(mcode_token[0]+1, "30") == 0)) {
+                    printf("program ended at line = %d\n\n", count);
+                    fprintf(fp, "program ended at line = %d\n\n", count);
+                    //break;
+                }
             //check to see type of mcode
             } else if (strcmp(token, "M00") == 0 || strcmp(token, "M0") == 0 || strcmp(token, "m0") == 0 || strcmp(token, "m00") == 0 ||
                 strcmp(token, "M01") == 0 || strcmp(token, "M1") == 0 || strcmp(token, "m1") == 0 || strcmp(token, "m01") == 0 ||
@@ -198,42 +265,7 @@ int main(void) //int argc, char *argv[]
                 strcmp(token, "M30") == 0 || strcmp(token, "M30") == 0 || strcmp(token, "m30") == 0 || strcmp(token, "m30") == 0 ) {
                 char mcode[] = "M";
                 strcat(mcode,token+1);
-                int seen_already = 0;
-
-                //if stop program mcode given then program is stopped
-                if (strstr("00102", token+1) != NULL || strcmp(token+1, "30") == 0) {
-                    printf("program ended at line = %d\n\n", count);
-                    fprintf(fp, "program ended at line = %d\n\n", count);
-                    seen_already = 1;
-                    //break;
-                //if stop spindle command given set its speed to 0
-                } else if (strstr("05", token+1) != NULL) {
-                    strcpy(spindle_speed, "0");
-                    seen_already = 1;
-                    //Printed out the parsed data
-                    printf("x= %s\n", x_pos);
-                    fprintf(fp, "x= %s\n", x_pos); 
-                    printf("y= %s\n", y_pos);
-                    fprintf(fp, "y= %s\n", y_pos); 
-                    printf("z= %s\n", z_pos);
-                    fprintf(fp, "z= %s\n", z_pos);
-                    //printf("i= %s\n", i_pos);
-                    //fprintf(fp, "i= %s\n", i_pos); 
-                    //printf("j= %s\n", j_pos);
-                    //fprintf(fp, "j= %s\n", j_pos); 
-                    //printf("k= %s\n", k_pos);
-                    //fprintf(fp, "k= %s\n", k_pos);
-                    printf("current tool= %s\n", curr_tool);
-                    fprintf(fp, "current tool= %s\n", curr_tool);
-                    printf("spindle speed= %s\n\n", spindle_speed);
-                    fprintf(fp, "spindle speed= %s\n\n", spindle_speed);
-                    if (strcmp(recent_gcode, "G01") == 0 || strcmp(recent_gcode, "G1") == 0 || strcmp(recent_gcode, "g1") == 0 || strcmp(recent_gcode, "g01") == 0 ||
-                        strcmp(recent_gcode, "G02") == 0 || strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "g2") == 0 || strcmp(recent_gcode, "g02") == 0 ||
-                        strcmp(recent_gcode, "G03") == 0 || strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "g3") == 0 || strcmp(recent_gcode, "g03") == 0){
-                        printf("feed rate= %s\n\n", feed_rate);
-                        fprintf(fp, "feed rate= %s\n\n", feed_rate);
-                    }
-                } 
+                int seen_already = 0; 
 
                 token = strtok(NULL, " ");
                 char *rest_token[BUFFERSIZE];
@@ -290,6 +322,45 @@ int main(void) //int argc, char *argv[]
                     //break;
                 }
 
+                //Check to make sure end program m codes and 
+                //stop spindle speed m codes are only m codes on line
+                if (index == 0) {
+                    //if stop program mcode given then program is stopped
+                    if (strstr("00102", mcode+1) != NULL || strcmp(mcode+1, "30") == 0) {
+                        printf("program ended at line = %d\n\n", count);
+                        fprintf(fp, "program ended at line = %d\n\n", count);
+                        seen_already = 1;
+                        //break;
+                    //if stop spindle command given set its speed to 0
+                    } else if (strstr("05", mcode+1) != NULL) {
+                        strcpy(spindle_speed, "0");
+                        seen_already = 1;
+                        //Printed out the parsed data
+                        printf("x= %s\n", x_pos);
+                        fprintf(fp, "x= %s\n", x_pos); 
+                        printf("y= %s\n", y_pos);
+                        fprintf(fp, "y= %s\n", y_pos); 
+                        printf("z= %s\n", z_pos);
+                        fprintf(fp, "z= %s\n", z_pos);
+                        //printf("i= %s\n", i_pos);
+                        //fprintf(fp, "i= %s\n", i_pos); 
+                        //printf("j= %s\n", j_pos);
+                        //fprintf(fp, "j= %s\n", j_pos); 
+                        //printf("k= %s\n", k_pos);
+                        //fprintf(fp, "k= %s\n", k_pos);
+                        printf("current tool= %s\n", curr_tool);
+                        fprintf(fp, "current tool= %s\n", curr_tool);
+                        printf("spindle speed= %s\n\n", spindle_speed);
+                        fprintf(fp, "spindle speed= %s\n\n", spindle_speed);
+                        if (strcmp(recent_gcode, "G01") == 0 || strcmp(recent_gcode, "G1") == 0 || strcmp(recent_gcode, "g1") == 0 || strcmp(recent_gcode, "g01") == 0 ||
+                            strcmp(recent_gcode, "G02") == 0 || strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "g2") == 0 || strcmp(recent_gcode, "g02") == 0 ||
+                            strcmp(recent_gcode, "G03") == 0 || strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "g3") == 0 || strcmp(recent_gcode, "g03") == 0){
+                            printf("feed rate= %s\n\n", feed_rate);
+                            fprintf(fp, "feed rate= %s\n\n", feed_rate);
+                        }
+                    }
+                }
+
                 int len = index;
                 index = 0;
                 int check = mcode_parse(mcode, rest_token, len);
@@ -326,6 +397,119 @@ int main(void) //int argc, char *argv[]
                         printf("feed rate= %s\n\n", feed_rate);
                         fprintf(fp, "feed rate= %s\n\n", feed_rate);
                     }
+                }
+            //for cases when tool change or spindle speed change is given before m code
+            //for example: t3 m6;
+            } else if (strstr(token, "t") != NULL || strstr(token, "T") != NULL || strstr(token, "s") != NULL ||
+                strstr(token, "S") != NULL) {
+                char test[1] = "n";
+                test[0] = token[0];
+                if (strstr(test, "t") != NULL || strstr(test, "T") != NULL || strstr(test, "s") != NULL ||
+                    strstr(test, "S") != NULL) {
+
+                    char *rest_token[BUFFERSIZE];
+                    int index = 0;
+                    int in_comment = 0; //tracker for if we are in a comment. 0 means not in a comment. 1 means in a comment.
+                
+                    //checks to see if there is a space between a coordinate and its value
+                    //for example = "X 36"
+                    //if there is a space it will concatenate those 2 token strings "X36"
+                    if (strlen(token) == 1) {
+                        char *concat = token;
+                        token = strtok(NULL, " ");
+                        strcat(concat, token);
+                        token = concat;
+                    }
+
+                    //split rest of argument string and put into "rest_token"
+                    while(token != NULL) {
+                        //if we are in a comment ignore the string tokens
+                        if (strstr(token, "(") != NULL && strstr(token, ")") == NULL) {
+                            in_comment = 1;
+                            token = strtok(NULL, " ");
+                        //finds end of comment and changes in_comment to 0 to signal out of comment
+                        } else if (strstr(token, ")") != NULL && strstr(token, "(") == NULL) {
+                            in_comment = 0;
+                            token = strtok(NULL, " ");
+                        //checks to see if there is a space between a coordinate and its value
+                        //for example = "t 36"
+                        //if there is a space it will concatenate those 2 token strings "t36"
+                        } else if ((strstr(token, "t") != NULL || strstr(token, "T") != NULL || strstr(token, "s") != NULL ||
+                            strstr(token, "S") != NULL ) && strlen(token) == 1) {
+                            char *concat = token;
+                            token = strtok(NULL, " "); 
+                            strcat(concat, token);
+                            token = concat;
+                            rest_token[index] = token;
+                            index = index + 1;
+                            token = strtok(NULL, " ");
+                        //if not in comment then add values to rest_token
+                        } else if (in_comment == 0 && strstr(token, "(") == NULL && strstr(token, ")") == NULL) {
+                            rest_token[index] = token;
+                            index = index + 1;
+                            token = strtok(NULL, " ");
+                        } else {
+                            token = strtok(NULL, " ");
+                        }
+                    }
+
+                    //Check to see if comments were closed correctly
+                    if (in_comment == 1) {
+                        printf("improper comment at line = %d\n\n", count);
+                        fprintf(fp, "improper comment at line = %d\n\n", count); 
+                        //break;
+                    }
+
+                    int len = index;
+                    index = 0;
+                    int check = 0;
+                    char mcode[BUFFERSIZE] = "M";
+
+                    if (len == 2 && (strstr(rest_token[1],"m") != NULL || strstr(rest_token[1],"M") != NULL)) {
+                        strcat(mcode, rest_token[1]+1);
+                        len = len - 1;
+                        check = mcode_parse(mcode, rest_token, len);
+                    } else {
+                        printf("improper proper code inputted at line = %d\n\n", count);
+                        fprintf(fp, "improper proper code inputted at line = %d\n\n", count); 
+                        //break;
+                    }
+
+                    //Check to see if commands followed proper syntax and form
+                    //If not stop and print error
+                    if (check == 0) {
+                        printf("improper proper code inputted at line = %d\n\n", count);
+                        fprintf(fp, "improper proper code inputted at line = %d\n\n", count); 
+                        //break;
+                    }
+
+                    if (strcmp(mcode+1, "03") == 0 || strcmp(mcode+1,"04") == 0 || strcmp(mcode+1, "06") == 0 ||
+                    strstr("346", mcode+1) != NULL || strcmp(mcode+1, "16") == 0) {
+                        //Printed out the parsed data
+                        printf("x= %s\n", x_pos);
+                        fprintf(fp, "x= %s\n", x_pos); 
+                        printf("y= %s\n", y_pos);
+                        fprintf(fp, "y= %s\n", y_pos); 
+                        printf("z= %s\n", z_pos);
+                        fprintf(fp, "z= %s\n", z_pos);
+                        //printf("i= %s\n", i_pos);
+                        //fprintf(fp, "i= %s\n", i_pos); 
+                        //printf("j= %s\n", j_pos);
+                        //fprintf(fp, "j= %s\n", j_pos); 
+                        //printf("k= %s\n", k_pos);
+                        //fprintf(fp, "k= %s\n", k_pos);
+                        printf("current tool= %s\n", curr_tool);
+                        fprintf(fp, "current tool= %s\n", curr_tool);
+                        printf("spindle speed= %s\n\n", spindle_speed);
+                        fprintf(fp, "spindle speed= %s\n\n", spindle_speed);
+                        if (strcmp(recent_gcode, "G01") == 0 || strcmp(recent_gcode, "G1") == 0 || strcmp(recent_gcode, "g1") == 0 || strcmp(recent_gcode, "g01") == 0 ||
+                            strcmp(recent_gcode, "G02") == 0 || strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "g2") == 0 || strcmp(recent_gcode, "g02") == 0 ||
+                            strcmp(recent_gcode, "G03") == 0 || strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "g3") == 0 || strcmp(recent_gcode, "g03") == 0){
+                            printf("feed rate= %s\n\n", feed_rate);
+                            fprintf(fp, "feed rate= %s\n\n", feed_rate);
+                        }
+                    }
+
                 }
             //stop interpreter if end of file token "%" seen
             } else if (strcmp(token, "%") == 0) {

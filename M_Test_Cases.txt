@@ -1,4 +1,12 @@
 %
+(assumes mcode is last);
+g01 z4 x1 m3 s72 (no error);
+g01 z73 t45 m6 (no error);
+g00 y62 m6 t 3 (no error);
+g00 x916 m5 (no error);
+g0 z99 m0 (no error);
+g00 y32 m3 s40 m5 (error);
+g00 x56 s55 m3 m5 (error);
 t 10 m6 (no error); 
 t 12 m6 m16 t9 (error);
 s 1000 m4 (no error);
@@ -6,7 +14,6 @@ s54 M04 t5 M16 (error);
 M16 t3 m5 (error);
 m1 m5 (error); 
 m5 m2 (error); 
-g01 z4 x1 (no error);
 m0 (no error);
 m00 (no error);
 M0 (no error);
