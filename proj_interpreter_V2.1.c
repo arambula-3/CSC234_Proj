@@ -1007,7 +1007,6 @@ int mcode_parse(char *mcode, char *args[], int len) {
                 strcpy(curr_tool, ret[i]);
             }
         }
-
         if (!tool_provided) {
         printf("Error: Tool parameter 'T' is missing for M06 command.\n");
         }
