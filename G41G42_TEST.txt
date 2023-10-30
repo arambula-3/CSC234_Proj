@@ -1,10 +1,10 @@
 %
 D1 = 5.0  ; (Setup Radius of the 10mm tool)
-G00 X10 Y10 ;
+g00 X10 Y10 ;
 G41 D1 (Activate cutter compensation to the left);
-G01 X50 ;
+G01 x50 ;
 G40 (Cancel cutter compensation);
-G00 X50 Y10 ; 
+g00 x 50 Y10 ; 
 G42 D1 (Activate cutter compensation to the right);
 G01 Y40 ;
 G40 (Cancel cutter compensation);
