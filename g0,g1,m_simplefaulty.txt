@@ -1,0 +1,8 @@
+%
+(spindle speed not set);
+M06 T1 (Change to tool 1);
+m3;
+G0 X0 Y0 (Move to the origin);
+G1 X50 Y0 F50 (Cut a line to X50 Y0);
+M05 (Stop spindle);
+%

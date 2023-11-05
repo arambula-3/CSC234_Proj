@@ -1,0 +1,6 @@
+%
+(Drilling at a Point);
+G0 X25 Y25 (Move to the start position);
+G1 Z-5 F500 (Drill down 5mm at a feed rate of 500);
+G0 Z5 (Retract the drill);
+%
