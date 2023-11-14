@@ -1,6 +1,6 @@
 %
 (assumes mcode is last);
-g01 z4 x1 m3 s72 (x = 1, z = 4, spindle speed = 72);
+g01 z4 x1 f3 m3 s72 (x = 1, z = 4, feedrate = 3, spindle speed = 72);
 g01 z73 t45 m6 (z = 73, tool = 45);
 g00 y62 m6 t 3 (y = 62, tool = 3);
 g00 x916 m5 (x = 916, spindle speed = 0);
