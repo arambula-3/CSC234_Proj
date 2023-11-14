@@ -1,0 +1,9 @@
+%
+(Faulty simple program for g02 and g03)
+G01 Z-2.0 F100; Rapid move to a safe Z level and start cutting
+G01 X10 Y0 F50; Linear move to (10, 0)
+G02 X20 Y0 I10 J0; Faulty clockwise arc with a missing F parameter
+G01 X20 Y10 F50; Linear move to (20, 10)
+G00 Z2.0; Rapid retract to a safe Z level
+M30; Program end and rewind
+%
