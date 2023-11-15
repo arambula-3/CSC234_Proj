@@ -1,5 +1,5 @@
 %
-(Faulty moderate complex g02 and g03)
+(Faulty moderate complex g02 and g03);
 G01 Z-2.0 F100; Rapid move to a safe Z level and start cutting
 G02 X10 Y0 I5 J5 F50; Clockwise arc with a center at (5, 5)
 G03 X20 Y0 I0 J10 F50; Faulty counterclockwise arc with a mismatched center at (0, 10)

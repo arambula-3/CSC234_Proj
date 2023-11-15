@@ -1,5 +1,5 @@
 %
-(Correct Simple g02 and g03)
+(Correct Simple g02 and g03);
 G1 x0 y0 f10;
 G2 x1.2 y2 i1.2 j2;
 %
