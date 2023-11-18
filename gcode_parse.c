@@ -184,7 +184,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             }
         }
         if (*d_len2 > 0) {
-            cutter_compensation_validate(cutter_comp_direction, *comp_count,
+            check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
             x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
             x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
             previous_gcode);
@@ -456,7 +456,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
         }
 
         if (*d_len2 > 0) {
-            cutter_compensation_validate(cutter_comp_direction, *comp_count,
+            check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
             x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
             x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
             previous_gcode);
@@ -515,7 +515,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             }
         }
         strcpy(recent_gcode, "G40");
-        cutter_compensation_validate(cutter_comp_direction, *comp_count,
+        check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
         x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
         x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
         previous_gcode);
@@ -618,7 +618,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             check = 0;
             //break;
         }
-        cutter_compensation_validate(cutter_comp_direction, *comp_count,
+        check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
         x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
         x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
         previous_gcode);
