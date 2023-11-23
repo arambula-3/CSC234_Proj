@@ -18,17 +18,6 @@ typedef enum {
 // Variable to keep track of the current plane
 Plane current_plane = XY_PLANE;
 
-// Function to set the current plane based on the G-code
-void set_plane(const char* gcode) {
-    if (strcmp(gcode, "G17") == 0) {
-        current_plane = XY_PLANE;
-    } else if (strcmp(gcode, "G18") == 0) {
-        current_plane = XZ_PLANE;
-    } else if (strcmp(gcode, "G19") == 0) {
-        current_plane = YZ_PLANE;
-    }
-}
-
 //gcode = Gcode passed in
 //coords = array of X,Y,Z passed in
 //len = number of arguments passed to coords
@@ -332,9 +321,9 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 }
             }
 
-            if(!z_given){
-                strcpy(z_pos,"0");
-            }
+            //if(!z_given){
+              //  strcpy(z_pos,"0");
+            //}
 
                 break;
             case XZ_PLANE:
@@ -402,36 +391,6 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             }
         }
 
-    
-        if (strcmp(gcode, "G17") == 0) {  // XY Plane
-            if (i_given == 0 && j_given == 0) {
-                printf("Error: I or J value required for G2/G3 command in XY plane\n");
-                fprintf(fp, "Error: I or J value required for G2/G3 command in XY plane\n");
-            }
-            if (k_given != 0) {
-                printf("Warning: K value is not used in XY plane\n");
-                fprintf(fp, "Warning: K value is not used in XY plane\n");
-            }
-        } else if (strcmp(gcode, "G18") == 0) {  // XZ Plane
-            if (i_given == 0 && k_given == 0) {
-                printf("Error: I or K value required for G2/G3 command in XZ plane\n");
-                fprintf(fp, "Error: I or K value required for G2/G3 command in XZ plane\n");
-            }
-            if (j_given != 0) {
-                printf("Warning: J value is not used in XZ plane\n");
-                fprintf(fp, "Warning: J value is not used in XZ plane\n");
-            }
-        } else if (strcmp(gcode, "G19") == 0) {  // YZ Plane
-            if (j_given == 0 && k_given == 0) {
-                printf("Error: J or K value required for G2/G3 command in YZ plane\n");
-                fprintf(fp, "Error: J or K value required for G2/G3 command in YZ plane\n");
-            }
-            if (i_given != 0) {
-                printf("Warning: I value is not used in YZ plane\n");
-                fprintf(fp, "Warning: I value is not used in YZ plane\n");
-            }
-        }
-
         if(!feedrate_given) {
             if(strcmp(feed_rate, "n/a") == 0){
                 printf("Error: feed rate not given for g2 or g3 command \n");
@@ -455,7 +414,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             check = 0;
         }
 
-        if (*d_len2 > 0) {
+        if (*d_len2 > 0 && check != 0) {
             check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
             x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
             x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
@@ -484,6 +443,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 *comp_count = -1;
                 continue;
             } else {
+                printf("here\n");
                 check = 0;
                 break;
             }
@@ -514,14 +474,16 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 } 
             }
         }
-        strcpy(recent_gcode, "G40");
-        check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
-        x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
-        x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
-        previous_gcode);
-        strcpy(cutter_comp_direction, "n/a");
-        d_len2 = 0;
-        *comp_count = 0;
+        if (check != 0) {
+            strcpy(recent_gcode, "G40");
+            check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
+            x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
+            x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
+            previous_gcode);
+            strcpy(cutter_comp_direction, "n/a");
+            d_len2 = 0;
+            *comp_count = 0;
+        }
     //If statement for handling g41/42 codes only
     } else if ((strcmp(gcode, "G41") == 0 || strcmp(gcode, "G42") == 0 || strcmp(gcode, "g41") == 0 || strcmp(gcode, "g42") == 0) ||
         ((strcmp(gcode+1,"01") == 0 || strcmp(gcode+1,"1") == 0) && 
@@ -618,11 +580,13 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             check = 0;
             //break;
         }
-        check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
-        x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
-        x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
-        previous_gcode);
-        *comp_count = *comp_count + 1;
+        if (check != 0) {
+            check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
+            x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
+            x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
+            previous_gcode);
+            *comp_count = *comp_count + 1;
+        }
     }
     return check;
 }

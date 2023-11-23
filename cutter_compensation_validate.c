@@ -26,6 +26,33 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
         } else if (strcmp(prev_x_pos, x_pos) != 0 && strcmp(prev_y_pos, y_pos) == 0 && isnan(*y_comp_pos)) {
             *y_comp_pos = atof(prev_y_pos) + (*d_len2/2);
             *x_comp_pos = atof(prev_x_pos);
+        //360 degree circle
+        } else if (strcmp(prev_x_pos, x_pos) == 0 && strcmp(prev_y_pos, y_pos) == 0 && 
+            (strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "G02") == 0 || 
+            strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "G03") == 0)) {
+            //clockwise circle
+            if (strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "G02") == 0) {
+                //cutter compensation left
+                if (strcmp(cutter_comp_direction, "left") == 0) {
+                    *x_comp_pos = atof(prev_x_pos);
+                    *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                //cutter compensation right
+                } else {
+                    *x_comp_pos = atof(prev_x_pos);
+                    *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                }
+            //counterclockwise circle
+            } else if (strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "G03") == 0) {
+                //cutter compensation left
+                if (strcmp(cutter_comp_direction, "left") == 0) {
+                    *x_comp_pos = atof(prev_x_pos);
+                    *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                //cutter compensation right
+                } else {
+                    *x_comp_pos = atof(prev_x_pos);
+                    *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                }
+            }
         //for point at bottom of slant/arc move to top right (clockwise and counterclockwise)
         } else if (atof(x_pos) > atof(prev_x_pos) && atof(y_pos) > atof(prev_y_pos)) {
             if (strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "G02") == 0) {

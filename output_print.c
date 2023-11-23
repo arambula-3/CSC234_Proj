@@ -18,12 +18,23 @@ void output_print(FILE *fp, int comp_pos, char *recent_gcode, char *x_pos, char 
         } else {
             x_final_pos = atof(x_pos);
             y_final_pos = atof(y_pos);
+            if (strcmp(x_pos,"n/a") == 0) {
+            x_final_pos = NAN;
+            }
+            if (strcmp(y_pos,"n/a") == 0) {
+                y_final_pos = NAN;
+            }
         }
     } else if (d_len2 == 0 || isnan(d_len2)) {
         x_final_pos = atof(x_pos);
         y_final_pos = atof(y_pos);
+        if (strcmp(x_pos,"n/a") == 0) {
+            x_final_pos = NAN;
+        }
+        if (strcmp(y_pos,"n/a") == 0) {
+            y_final_pos = NAN;
+        }
     } else {
-        printf("here?\n");
         x_final_pos = x_comp_pos;
         y_final_pos = y_comp_pos;
     }
@@ -31,8 +42,13 @@ void output_print(FILE *fp, int comp_pos, char *recent_gcode, char *x_pos, char 
     fprintf(fp, "final x test= %.3f\n", x_final_pos); 
     printf("final y test= %.3f\n", y_final_pos);  
     fprintf(fp, "final y test= %.3f\n", y_final_pos);
-    printf("z= %s\n", z_pos);
-    fprintf(fp, "z= %s\n", z_pos);
+    if (strcmp(z_pos,"n/a") == 0) {
+        printf("z= %.3f\n", NAN);
+        fprintf(fp, "z= %.3f\n", NAN);
+    } else {
+        printf("z= %.3f\n", atof(z_pos));
+        fprintf(fp, "z= %.3f\n", atof(z_pos));
+    }
     printf("i= %s\n", i_pos);
     fprintf(fp, "i= %s\n", i_pos); 
     printf("j= %s\n", j_pos);
@@ -41,6 +57,16 @@ void output_print(FILE *fp, int comp_pos, char *recent_gcode, char *x_pos, char 
     fprintf(fp, "current tool= %s\n", curr_tool);
     printf("spindle speed= %s\n", spindle_speed);
     fprintf(fp, "spindle speed= %s\n", spindle_speed);
+    ////final print format//////
+    printf("| X Position | Y Position | Z Position | Current Tool | Spindle Speed |\n");
+    fprintf(fp, "| X Position | Y Position | Z Position | Current Tool | Spindle Speed |\n");
+    if (strcmp(z_pos,"n/a") == 0) {
+        printf("| %.3f | %.3f | %.3f | %s | %s |\n", x_final_pos, y_final_pos, NAN, curr_tool, spindle_speed);
+        fprintf(fp, "| %.3f | %.3f | %.3f | %s | %s |\n", x_final_pos, y_final_pos, NAN, curr_tool, spindle_speed);
+    } else {
+        printf("| %.3f | %.3f | %.3f | %s | %s |\n", x_final_pos, y_final_pos, atof(z_pos), curr_tool, spindle_speed);
+        fprintf(fp, "| %.3f | %.3f | %.3f | %s | %s |\n", x_final_pos, y_final_pos, atof(z_pos), curr_tool, spindle_speed);
+    }
     if (strcmp(recent_gcode, "G40") == 0) {
         d_len2 = 0;
     }
