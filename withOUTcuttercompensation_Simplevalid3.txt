@@ -1,0 +1,7 @@
+%
+M03 S1200 (Start spindle clockwise at 1200 RPM);
+G00 X0 Y0 (Rapid move to starting point);
+G01 X100 Y0 F200 (Linear move to X100, Y0);
+G02 X50 Y50 I-50 J0 F150 (Half-circle clockwise to X50, Y50);
+M05 (Stop spindle);
+%

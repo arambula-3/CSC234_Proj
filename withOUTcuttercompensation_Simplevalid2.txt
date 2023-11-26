@@ -1,0 +1,8 @@
+%
+M04 S1000 (Start spindle counter-clockwise at 1000 RPM);
+G00 X100 Y100 (Rapid move to X100, Y100);
+G01 X150 Y150 F100 (Linear move to X150, Y150);
+G03 X200 Y200 I25 J25 F200 (Counter-clockwise arc to X200, Y200);
+G02 X150 Y150 I-25 J-25 F200 (Clockwise arc back to X150, Y150);
+M05 (Stop spindle);
+%
