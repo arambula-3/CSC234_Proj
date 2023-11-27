@@ -1,0 +1,9 @@
+%
+M03 S1500 (Start spindle clockwise at 1500 RPM);
+G00 X0 Y0 (Rapid move to starting point);
+G01 X100 Y0 F200 (Linear move to X100, Y0);
+G03 X100 Y100 I0 J50 F150 (Quarter circle counter-clockwise);
+G01 X0 Y100 F200 (Linear move to X0, Y100);
+G03 X0 Y0 I-50 J0 F150 (Quarter circle counter-clockwise back to start);
+M05 (Stop spindle);
+%
