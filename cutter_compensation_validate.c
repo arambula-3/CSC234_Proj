@@ -54,13 +54,23 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                 }
             }
         //for point at bottom of slant/arc move to top right (clockwise and counterclockwise)
+        //       xxxxxxx
+        //            xx
+        //        xx  x
+        //     xxx    x
+        //   xxx
+        //  xx
+        // x
         } else if (atof(x_pos) > atof(prev_x_pos) && atof(y_pos) > atof(prev_y_pos)) {
+            //for clockwise arc
             if (strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "G02") == 0) {
                 *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
                 *y_comp_pos = atof(prev_y_pos);
+            //for counterclockwise arc
             } else if (strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "G03") == 0) {
                 *x_comp_pos = atof(prev_x_pos);
                 *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+            //for straight lines
             } else {
                 float helperA = atof(x_pos) - atof(prev_x_pos);
                 float helperB = atof(y_pos) - atof(prev_y_pos);
@@ -107,27 +117,61 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                 float comp = sqrt(compTriangleC * compTriangleC - (*d_len2/2) * (*d_len2/2));
 
                 if (strcmp(cutter_comp_direction, "left") == 0) {
-                    if (strcmp(prev_x_pos2, prev_x_pos) == 0) {
+                    //for obtuse exterior angle
+                    if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) < atof(prev_y_pos)) {
                         *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
                         *y_comp_pos = atof(prev_y_pos) + comp;
-                    } else {
+                    //for acute exterior angle
+                    } else if (strcmp(prev_y_pos2, prev_y_pos) == 0 && atof(prev_x_pos2) > atof(prev_x_pos)) {
                         *x_comp_pos = atof(prev_x_pos) - comp;
                         *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    //for obtuse interior angle
+                    } else if (strcmp(prev_y_pos2, prev_y_pos) == 0 && atof(prev_y_pos2) < atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    //for acute interior angle
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
                     }
                 } else if (strcmp(cutter_comp_direction, "right") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) + comp;
-                    *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    //for obtuse interior angle
+                    if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) < atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for acute interior angle
+                    } else if (strcmp(prev_y_pos2, prev_y_pos) == 0 && atof(prev_x_pos2) > atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    //for obtuse exterior angle
+                    } else if (strcmp(prev_y_pos2, prev_y_pos) == 0 && atof(prev_x_pos2) < atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    //for acute exterior angle
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    }
                 }
             }
-        //for point at top of slant/arc move to top right (clockwise)
-        //for point at bottom of slant/arc move to bottom right (counterclockwise)
+        //for cut going from left to right
+        //              xx
+        //                xx
+        //                  xxx
+        // xxxxxxxxx xxxxx    x
+        //                   xx
+        //                xxx
+        //              xx
         } else if (atof(x_pos) > atof(prev_x_pos) && atof(y_pos) == atof(prev_y_pos)) {
+            //for clockwise arc
             if (strcmp(previous_gcode, "G2") == 0 || strcmp(previous_gcode, "G02") == 0) {
                 *x_comp_pos = atof(prev_x_pos);
                 *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+            //for counterclockwise arc
             } else if (strcmp(previous_gcode, "G3") == 0 || strcmp(previous_gcode, "G03") == 0) {
                 *x_comp_pos = atof(prev_x_pos);
                 *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+            //for straight lines
             } else {
                 float helperA = atof(prev_x_pos) - atof(prev_x_pos2);
                 float helperB = atof(prev_y_pos) - atof(prev_y_pos2);
@@ -145,21 +189,46 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                 float comp = sqrt(compTriangleC * compTriangleC - (*d_len2/2) * (*d_len2/2));
 
                 if (strcmp(cutter_comp_direction, "left") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) - comp;
-                    *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    //for exterior angles
+                    if (atof(prev_y_pos2) < atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    //for interior angles
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    }
                 } else if (strcmp(cutter_comp_direction, "right") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) - comp;
-                    *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    //for exterior angles
+                    if (atof(prev_y_pos2) > atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    //for interior angles
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    }
                 }
             }
-        //for point at top of slant/arc move to bottom right (clockwise and counterclockwise) 
+        //for point at top of slant/arc move to bottom right (clockwise and counterclockwise)
+        // x
+        //  xx
+        //   xx
+        //    xx
+        //     xx  x
+        //   xx xx x
+        //     xx  x
+        //        xx 
         } else if (atof(x_pos) > atof(prev_x_pos) && atof(y_pos) < atof(prev_y_pos)) {
+            //for clockwise arc
             if (strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "G02") == 0) {
                 *x_comp_pos = atof(prev_x_pos);
                 *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+            //for counterclockwise arc
             } else if (strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "G03") == 0) {
                 *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
                 *y_comp_pos = atof(prev_y_pos);
+            //for sraight lines
             } else {
                 float helperA = atof(x_pos) - atof(prev_x_pos);
                 float helperB = atof(prev_y_pos) - atof(y_pos);
@@ -206,19 +275,60 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                 float comp = sqrt(compTriangleC * compTriangleC - (*d_len2/2) * (*d_len2/2));
 
                 if (strcmp(cutter_comp_direction, "left") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) + comp;
-                    *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    //for acute exterior angle
+                    if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) < atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for obtuse exterior angle
+                    } else if (strcmp(prev_y_pos2, prev_y_pos) == 0 && atof(prev_x_pos2) < atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    //for obtuse interior angle
+                    } else if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) > atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for acute interior angle
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    }
                 } else if (strcmp(cutter_comp_direction, "right") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
-                    *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for acute interior angle
+                    if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) < atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for obtuse interior angle
+                    } else if (strcmp(prev_y_pos2, prev_y_pos) == 0 && atof(prev_x_pos2) < atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    //for obtuse exterior angle
+                    } else if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) > atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for acute exterior angle
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    }
                 }
             }
-        //for point at bottom of slant/arc move to bottom right (clockwise)
-        //for point at bottom of slant/arc move to bottom left (counterclockwise)
+        //for cut going from top to bottom
+        //     x
+        //     x
+        //     x
+        //     x
+        // x   x   x
+        // x   x   x
+        // xx  x  xx
+        //  xx    x
+        //   xxxxxx
+        //     xx
         } else if (atof(x_pos) == atof(prev_x_pos) && atof(y_pos) < atof(prev_y_pos)) {
+            //for clockwise arc
             if (strcmp(previous_gcode, "G2") == 0 || strcmp(previous_gcode, "G02") == 0) {
                 *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
                 *y_comp_pos = atof(prev_y_pos);
+            //for counterclockwise arc
             } else if (strcmp(previous_gcode, "G3") == 0 || strcmp(previous_gcode, "G03") == 0) {
                 //if executing arc into arc move
                 if (strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "G02") == 0) {
@@ -231,6 +341,7 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
             } else if (strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "G03") == 0) {
                 *x_comp_pos = atof(prev_x_pos);
                 *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+            //for straight lines
             } else {
                 float helperA = atof(prev_x_pos) - atof(prev_x_pos2);
                 float helperB = atof(prev_y_pos2) - atof(prev_y_pos);
@@ -243,21 +354,44 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                 float comp = sqrt(compTriangleC * compTriangleC - (*d_len2/2) * (*d_len2/2));
 
                 if (strcmp(cutter_comp_direction, "left") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
-                    *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for exterior angles
+                    if (atof(prev_x_pos2) < atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for interior angles
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    }
                 } else if (strcmp(cutter_comp_direction, "right") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
-                    *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for exterior angles
+                    if (atof(prev_x_pos2) > atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for interior angles
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    }
                 }
             }
         //for point at top of slant/arc move to bottom left (clockwise and counterclockwise)
+        //             xx
+        // x        xxx
+        // x     xxxx
+        // x   xx
+        // x xxx
+        // xxxxxxxxxx
         } else if (atof(x_pos) < atof(prev_x_pos) && atof(y_pos) < atof(prev_y_pos)) {
+            //for clockwise arc
             if (strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "G02") == 0) {
                 *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
                 *y_comp_pos = atof(prev_y_pos);
+            //for counterclockwise arc
             } else if (strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "G03") == 0) {
                 *x_comp_pos = atof(prev_x_pos);
                 *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+            //for straight lines
             } else {
                 float helperA = atof(prev_x_pos) - atof(x_pos);
                 float helperB = atof(prev_y_pos) - atof(y_pos);
@@ -304,16 +438,53 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                 float comp = sqrt(compTriangleC * compTriangleC - (*d_len2/2) * (*d_len2/2));
 
                 if (strcmp(cutter_comp_direction, "left") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
-                    *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for acute interior angle
+                    if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) < atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for obtuse interior angle
+                    } else if (strcmp(prev_y_pos2, prev_y_pos) == 0 && atof(prev_x_pos2) > atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    //for obtuse exterior angle
+                    } else if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) > atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for acute exterior angle
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    }
                 } else if (strcmp(cutter_comp_direction, "right") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) - comp;
-                    *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    //for acute exterior angle
+                    if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) < atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for obtuse exterior angle
+                    } else if (strcmp(prev_y_pos2, prev_y_pos) == 0 && atof(prev_x_pos2) > atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    //for obtuse interior angle
+                    } else if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) > atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for acute interior angle
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    }
                 }
             }
-        //for point at bottom of slant/arc move to bottom left (clockwise)
-        //for point at top of slant/arc move to top left (counterclockwise)
+        //for cut from right to left
+        //       x
+        //    xxxx
+        //  xxx
+        // xx   xxx xxxx x xxxxxx
+        //  xxx
+        //    xxx
+        //       x
         } else if (atof(x_pos) < atof(prev_x_pos) && atof(y_pos) == atof(prev_y_pos)) {
+            //for clockwise arc
             if (strcmp(previous_gcode, "G2") == 0 || strcmp(previous_gcode, "G02") == 0) {
                 *x_comp_pos = atof(prev_x_pos);
                 *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
@@ -321,9 +492,11 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                     *x_comp_pos = atof(prev_x_pos);
                     *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
                 }
+            //for counterclockwise arc
             } else if (strcmp(previous_gcode, "G3") == 0 || strcmp(previous_gcode, "G03") == 0) {
                 *x_comp_pos = atof(prev_x_pos);
                 *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+            //for straight lines
             } else {
                 float helperA = atof(prev_x_pos2) - atof(prev_x_pos);
                 float helperB = atof(prev_y_pos2) - atof(prev_y_pos);
@@ -342,15 +515,47 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                     *x_comp_pos = atof(prev_x_pos) + comp;
                     *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
                 }
+
+                if (strcmp(cutter_comp_direction, "left") == 0) {
+                    //for exterior angles
+                    if (atof(prev_y_pos2) > atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    //for interior angles
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    }
+                } else if (strcmp(cutter_comp_direction, "right") == 0) {
+                    //for exterior angles
+                    if (atof(prev_y_pos2) < atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    //for interior angles
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    }
+                }
             }
         //for point at bottom of slant/arc move to top left (clockwise and counterclockwise)
+        // xxxxxxxxx
+        // x  x
+        // x   xxx
+        // x     xxx
+        // x       xxx
+        //            xx
+        //             xxx
         } else if (atof(x_pos) < atof(prev_x_pos) && atof(y_pos) > atof(prev_y_pos)) {
+            //for clockwise arc
             if (strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "G02") == 0) {
                 *x_comp_pos = atof(prev_x_pos);
                 *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+            //for counterclockwise arc
             } else if (strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "G03") == 0) {
                 *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
                 *y_comp_pos = atof(prev_y_pos);
+            //for straight lines
             } else {
                 float helperA = atof(prev_x_pos) - atof(x_pos);
                 float helperB = atof(y_pos) - atof(prev_y_pos);
@@ -397,19 +602,60 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                 float comp = sqrt(compTriangleC * compTriangleC - (*d_len2/2) * (*d_len2/2));
 
                 if (strcmp(cutter_comp_direction, "left") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) - comp;
-                    *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    //for acute exterior angle
+                    if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) > atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for obtuse exterior angle
+                    } else if (strcmp(prev_y_pos2, prev_y_pos) == 0 && atof(prev_x_pos2) > atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    //for obtuse interior angle
+                    } else if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) < atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for acute interior angle
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) - comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    }
                 } else if (strcmp(cutter_comp_direction, "right") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
-                    *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for acute interior angle
+                    if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) > atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for obtuse interior angle
+                    } else if (strcmp(prev_y_pos2, prev_y_pos) == 0 && atof(prev_x_pos2) > atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+                    //for obtuse exterior angle
+                    } else if (strcmp(prev_x_pos2, prev_x_pos) == 0 && atof(prev_y_pos2) < atof(prev_y_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
+                    //for acute exterior angle
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) + comp;
+                        *y_comp_pos = atof(prev_y_pos) - *d_len2/2;
+                    }
                 }
             }
-        //for point at top of slant/arc move to top left (clockwise)
-        //for point at top of slant/arc move to top right (counterclockwise)
+        //for cut from bottom to top
+        //     xx
+        //   xx xx
+        //  xx x xx
+        //  x  x  xx
+        // x   x   x
+        //     x
+        //     x
+        //     x
+        //     x
+        //     x
         } else if (atof(x_pos) == atof(prev_x_pos) && atof(y_pos) > atof(prev_y_pos)) {
+            //for clockwise arc
             if (strcmp(previous_gcode, "G2") == 0 || strcmp(previous_gcode, "G02") == 0) {
                 *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
                 *y_comp_pos = atof(prev_y_pos);
+            //for counterclockwise arc
             } else if (strcmp(previous_gcode, "G3") == 0 || strcmp(previous_gcode, "G03") == 0) {
                 //if executing arc into arc move
                 if (strcmp(recent_gcode, "G2") == 0 || strcmp(recent_gcode, "G02") == 0) {
@@ -422,6 +668,7 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
             } else if (strcmp(recent_gcode, "G3") == 0 || strcmp(recent_gcode, "G03") == 0) {
                 *x_comp_pos = atof(prev_x_pos);
                 *y_comp_pos = atof(prev_y_pos) + *d_len2/2;
+            //for straight lines
             } else {
                 float helperA = atof(prev_x_pos2) - atof(prev_x_pos);
                 float helperB = atof(prev_y_pos) - atof(prev_y_pos2);
@@ -434,11 +681,25 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                 float comp = sqrt(compTriangleC * compTriangleC - (*d_len2/2) * (*d_len2/2));
 
                 if (strcmp(cutter_comp_direction, "left") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
-                    *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for exterior angles
+                    if (atof(prev_x_pos2) > atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for interior angles
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) - *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
+                    }
                 } else if (strcmp(cutter_comp_direction, "right") == 0) {
-                    *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
-                    *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for exterior angles
+                    if (atof(prev_x_pos2) < atof(prev_x_pos)) {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) - comp;
+                    //for interior angles
+                    } else {
+                        *x_comp_pos = atof(prev_x_pos) + *d_len2/2;
+                        *y_comp_pos = atof(prev_y_pos) + comp;
+                    }
                 }
             }
         }

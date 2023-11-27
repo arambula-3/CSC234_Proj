@@ -443,7 +443,6 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 *comp_count = -1;
                 continue;
             } else {
-                printf("here\n");
                 check = 0;
                 break;
             }
@@ -481,7 +480,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
             previous_gcode);
             strcpy(cutter_comp_direction, "n/a");
-            d_len2 = 0;
+            *d_len2 = 0;
             *comp_count = 0;
         }
     //If statement for handling g41/42 codes only
