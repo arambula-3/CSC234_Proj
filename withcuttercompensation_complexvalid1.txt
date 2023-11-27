@@ -1,0 +1,16 @@
+%
+(rectangular pocket milling);
+M06 T1;
+M03 S1200 (Tool change to 1 and start spindle at 1200 RPM);
+G0 X0 Y0 (Rapid move to starting position);
+G1 Z5 F150 (Approach the surface);
+G1 X0 Y0 F150 (Move to starting corner of the rectangle);
+G41 D1 X10 Y0 (Activate cutter compensation left with tool diameter offset);
+G1 X100 Y0 (Mill first long side);
+G1 X100 Y50 (Mill first short side);
+G1 X0 Y50 (Mill second long side);
+G1 X0 Y0 (Mill second short side back to start);
+G40 X10 Y0 (Cancel cutter compensation);
+G0 Z5 (Retract tool);
+M05 (Stop spindle);
+%

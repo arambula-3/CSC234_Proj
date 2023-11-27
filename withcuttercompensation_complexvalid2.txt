@@ -1,0 +1,15 @@
+%
+(Zigzag Path);
+M6 t2;
+M3 S750;
+G1 X0 Y0 F150;
+G42 D1 X10 Y0;
+G1 X100 Y0; 
+G1 X100 Y10;
+G1 X0 Y10;
+G1 X0 Y20;
+G1 X100 Y20;
+G40 X0 Y20;
+G0 Z5;
+M05;
+%
