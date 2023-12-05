@@ -7,12 +7,16 @@
 #define BUFFERSIZE (256)
 #include "num_check.c"
 
+//calcuates and applies cutter compensation
+//cutter_comp_direction = which direction the cutter compensation is applied to "left","right",or "n/a"
+//comp_count = the number of lines that have compensation applied
+//d_len2 = the diameter of the tool
+//x_comp_pos = the compensation position of the X coordinate
+//y_comp_pos = the compensation position of the Y coordinate
 int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
     char *x_pos, char *y_pos, float *d_len2, char *prev_x_pos, char *prev_y_pos,
     float *x_comp_pos, float *y_comp_pos, char *recent_gcode, char *prev_x_pos2, char *prev_y_pos2,
     char *previous_gcode) {
-    printf("cutter comp direction = %s\n", cutter_comp_direction);
-    printf("comp count = %d\n", comp_count);
     if (comp_count > 0){
         //for first compensation move on x axis
         if (strcmp(prev_x_pos, x_pos) == 0 && strcmp(prev_y_pos, y_pos) != 0 && isnan(*x_comp_pos)) {

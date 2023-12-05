@@ -285,26 +285,56 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                     printf("r value can't be less than or equal to 0 \n");
                     fprintf(fp, "r value can't be less than or equal to 0 \n");
                 }
-            }  
+            }
+
+            //make I = 0 if J is given and I not given
+            //make J = 0 if I is given and J not given
+            if (i_given != 1 && j_given == 1) {
+                strcpy(i_pos, "0");
+            } else if (j_given != 1 && i_given == 1) {
+                strcpy(j_pos, "0");
+            }
+        }
+
+        //check if I and J value given is valid
+        float temp_i = atof(i_pos);
+        float temp_j = atof(j_pos);
+        float radius_check = 0;
+        float x_arc_center = atof(prev_x_pos) + temp_i;
+        float y_arc_center = atof(prev_y_pos) + temp_j;
+        float a = atof(x_pos) - x_arc_center;
+        float b = atof(y_pos) - y_arc_center;
+        float temp_radius = sqrt(a * a + b * b);
+        if (temp_i == 0) {
+            radius_check = fabs(temp_j);
+        } else if (temp_j == 0) {
+            radius_check = fabs(temp_i);
+        } else {
+            radius_check = sqrt(temp_i * temp_i + temp_j * temp_j);
+        }
+        if (temp_radius != radius_check) {
+            printf("Error: I and J value do not create a valid arc to X and Y \n");
+            fprintf(fp, "Error: I and J value do not create a valid arc to X and Y \n");
+            check = 0;
         }
 
         // chooses current_plane based on G17,18,19 
         switch (current_plane) {
             case XY_PLANE:
                 // Validate for XY plane
-                if (!x_given || !y_given) {
+                if ((!x_given || !y_given) && check != 0) {
                     if(strcmp(x_pos, "n/a") == 0){
                     printf("Error: X position not given for g2 or g3 command \n");
                     fprintf(fp, "Error: X position not given for g2 or g3 command \n");
                     check = 0;
                 }
-                if(strcmp(y_pos, "n/a") == 0){
+                if(strcmp(y_pos, "n/a") == 0 && check != 0){
                     printf("Error: Y position not given for g2 or g3 command \n");
                     fprintf(fp, "Error: Y position not given for g2 or g3 command \n");
                     check = 0;
                 }
                 else{
-                    if(strcmp(i_pos, "n/a")== 0 && strcmp(j_pos, "n/a")== 0 && i_given == 0 && j_given == 0){
+                    if(strcmp(i_pos, "n/a")== 0 && strcmp(j_pos, "n/a")== 0 && i_given == 0 && j_given == 0 && check != 0){
                     printf("Error:  i or j not given for g2 or g3 command \n");
                     fprintf(fp, "Error:  i or j not given for g2 or g3 command \n");
                     check = 0;
@@ -312,7 +342,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 }
                 }
                 else{
-                if(i_given == 0 && j_given == 0){
+                if(i_given == 0 && j_given == 0 && check != 0){
                     if(strcmp(i_pos, "n/a")== 0 && strcmp(j_pos, "n/a")== 0){
                     printf("Error:  i or j not given for g2 or g3 command \n");
                     fprintf(fp, "Error:  i or j not given for g2 or g3 command \n");
@@ -400,7 +430,6 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
         }
 
         //checks both I and J cannot be zero
-
         if (i_given && atof(i_pos) == 0 && j_given && atof(j_pos) == 0) {
             printf("Error: I and J cannot both be zero for G02/G03 commands\n");
             fprintf(fp, "Error: I and J cannot both be zero for G02/G03 commands\n");
@@ -427,6 +456,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
         (strcmp(coords[0], "g40") == 0 || strcmp(coords[0], "G40") == 0))) {
         for (int i = 0; i < len; i++) {
             int track;
+            *comp_count = -1;
             //Check to see that X coordinates are passed in
             if ((*coords[i] == 88) || (*coords[i] == 120)) {
                 check = 1;
@@ -440,7 +470,6 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 strcmp(coords[i], "g1") == 0 || strcmp(coords[i], "G1") || 
                 strcmp(coords[i], "g01") == 0 || strcmp(coords[i], "G01") ||
                 strcmp(coords[i], "g40") == 0 || strcmp(coords[i], "G40")) && i==0) {
-                *comp_count = -1;
                 continue;
             } else {
                 check = 0;
@@ -479,8 +508,6 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
             x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
             previous_gcode);
-            strcpy(cutter_comp_direction, "n/a");
-            *d_len2 = 0;
             *comp_count = 0;
         }
     //If statement for handling g41/42 codes only
