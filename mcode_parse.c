@@ -43,7 +43,7 @@ int mcode_parse(char *mcode, char *args[], int len, char *curr_tool, char *spind
             //calls num_check function to see if token is a valid float value
             if (num_check(ret[i]) != 1) {
                 check = 0;
-                //break;
+                break;
             }
 
             //change spindle speed if necessary
@@ -62,7 +62,7 @@ int mcode_parse(char *mcode, char *args[], int len, char *curr_tool, char *spind
                 track = 0;
             } else {
                 check = 0;
-                //break;
+                break;
             }
             char *temp = args[i];
             ret[i] = temp+1;
@@ -79,7 +79,7 @@ int mcode_parse(char *mcode, char *args[], int len, char *curr_tool, char *spind
             //calls num_check function to see if token is a valid float value
             if (num_check(ret[i]) != 1) {
                 check = 0;
-                //break;
+                break;
             }
 
             //change tool if necessary

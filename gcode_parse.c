@@ -79,7 +79,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             //calls num_check function to see if token is a valid float value
             if (num_check(ret[i]) != 1) {
                 check = 0;
-                //break;
+                break;
             }
             if (valid_input){
                 //change X's coordinates if necessary
@@ -137,7 +137,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             //calls num_check function to see if token is a valid float value
             if (num_check(ret[i]) != 1) {
                 check = 0;
-                //break;
+                break;
             }
 
             //change X's coordinates if necessary
@@ -159,7 +159,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                     printf("Error: Feed rate must be greater than or equal to 1 \n");
                     fprintf(fp, "Error: Feed rate must be greater than or equal to 1 \n");
                     check = 0;
-                    //break;
+                    break;
                 }
             }
 
@@ -169,15 +169,18 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 printf("Error: feed rate not given for g1 command \n");
                 fprintf(fp, "Error: feed rate not given for g1 command \n");
                 check = 0;
-                //break;
             }
         }
-        if (*d_len2 > 0) {
+        if (*d_len2 > 0 && check != 0) {
             check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
             x_pos, y_pos, d_len2, prev_x_pos, prev_y_pos,
             x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
             previous_gcode);
             *comp_count = *comp_count + 1;
+            if (check == 0) {
+                printf("Error: Too acute of angle corner cut\n");
+                fprintf(fp, "Error: Too acute of angle corner cut\n");
+            }
         }
     //if statement for handling "G02" and "G03" codes only
     } else if (strcmp(gcode, "G02") == 0 || strcmp(gcode, "G2") == 0 || strcmp(gcode, "g2") == 0 || strcmp(gcode, "g02") == 0 ||
@@ -237,7 +240,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             //calls num_check function to see if token is a valid float value
             if (num_check(ret[i]) != 1) {
                 check = 0;
-                //break;
+                break;
             }
 
             //change X's coordinates if necessary
@@ -262,7 +265,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                     printf("Error: Feed rate must be greater than or equal to 1 \n");
                     fprintf(fp, "Error: Feed rate must be greater than or equal to 1 \n");
                     check = 0;
-                    //break;
+                    break;
                 }
             } else if (track == 4) {
                 i_given = 1;
@@ -351,10 +354,6 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 }
             }
 
-            //if(!z_given){
-              //  strcpy(z_pos,"0");
-            //}
-
                 break;
             case XZ_PLANE:
                 // Validate for XZ plane
@@ -383,9 +382,6 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 }
             }
 
-            if(!y_given){
-                strcpy(y_pos,"0");
-            }
                 break;
             case YZ_PLANE:
                 // Validate for YZ plane
@@ -414,11 +410,8 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 }
             }
 
-            if(!x_given){
-                strcpy(x_pos,"0");
-            } else {
-                break;
-            }
+
+            break;
         }
 
         if(!feedrate_given) {
@@ -449,6 +442,10 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
             previous_gcode);
             *comp_count = *comp_count + 1;
+            if (check == 0) {
+                printf("Error: Too acute of angle corner cut\n");
+                fprintf(fp, "Error: Too acute of angle corner cut\n");
+            }
         }
     //If statement for handling g40 codes only
     } else if ((strcmp(gcode, "G40") == 0 || strcmp(gcode, "g40") == 0) ||
@@ -490,7 +487,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             //calls num_check function to see if token is a valid float value
             if (num_check(ret[i]) != 1) {
                 check = 0;
-                //break;
+                break;
             }
             if (valid_input){
                 //change X's coordinates if necessary
@@ -509,6 +506,10 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
             previous_gcode);
             *comp_count = 0;
+            if (check == 0) {
+                printf("Error: Too acute of angle corner cut\n");
+                fprintf(fp, "Error: Too acute of angle corner cut\n");
+            }
         }
     //If statement for handling g41/42 codes only
     } else if ((strcmp(gcode, "G41") == 0 || strcmp(gcode, "G42") == 0 || strcmp(gcode, "g41") == 0 || strcmp(gcode, "g42") == 0) ||
@@ -561,7 +562,6 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 check = 0;
                 break;
             }
-            //char *temp = coords[i];
             ret[i] = temp+1;
 
             //checks to see if token had a ";" attached to it
@@ -576,7 +576,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             //calls num_check function to see if token is a valid float value
             if (num_check(ret[i]) != 1) {
                 check = 0;
-                //break;
+                break;
             }
 
             if (check != 0 && track == 3) {
@@ -584,7 +584,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                 sscanf(ret[i], "%f", &num);
                 if (signbit(num) != 0 || num > 200) {
                     check = 0;
-                    //break;
+                    break;
                 }
             }
 
@@ -604,7 +604,6 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
         }
         if ((diameter_given != 1 || x_or_y_given != 1) && diameter_seen == 0) {
             check = 0;
-            //break;
         }
         if (check != 0) {
             check = cutter_compensation_validate(cutter_comp_direction, *comp_count,
@@ -612,6 +611,10 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             x_comp_pos, y_comp_pos, recent_gcode, prev_x_pos2, prev_y_pos2,
             previous_gcode);
             *comp_count = *comp_count + 1;
+            if (check == 0) {
+                printf("Error: Too acute of angle corner cut\n");
+                fprintf(fp, "Error: Too acute of angle corner cut\n");
+            }
         }
     }
     return check;
