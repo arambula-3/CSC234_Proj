@@ -1,0 +1,14 @@
+%
+M03 S1000 (Start spindle clockwise at 1000 RPM);
+M06 T03 (Tool change);
+G00 X0 Y0 (Rapid move to origin);
+G01 X50 Y0 F150 (Linear move to X50, Y0);
+G02 X100 Y50 I25 J25 F120 (Clockwise arc to X100, Y50);
+G03 X50 Y100 I-25 J25 F180 (Counter-clockwise arc to X50, Y100);
+G01 X0 Y150 F200 (Linear move to X0, Y150);
+M06 t06 (Tool change);
+G02 X50 Y200 I50 J0 F150 (Clockwise arc to X50, Y200);
+M04 S350 (Change spindle direction);
+G01 X0 Y250 F100 (Linear move to X0, Y250);
+M05 (Stop spindle);
+%

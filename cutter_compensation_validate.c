@@ -707,6 +707,7 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
                 }
             }
         }
+        return 1;
     //If next G code is G40 
     } else if (comp_count == -1) {
         float x_comp = (*d_len2/2) * sin(45 * (M_PI/180));
@@ -752,6 +753,10 @@ int cutter_compensation_validate(char *cutter_comp_direction, int comp_count,
             *x_comp_pos = atof(prev_x_pos) + x_comp;
             *y_comp_pos = atof(prev_y_pos) - y_comp;
         }
+        return 1;
+    } else if (comp_count == 0) {
+        return 1;
+    } else {
+        return 0;
     }
-    return 1;
 }

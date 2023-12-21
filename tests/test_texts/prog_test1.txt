@@ -1,0 +1,18 @@
+%
+(Valid PROGRAM 3 CREATES AN interior Octagon COUNTERCLOCKWISE);
+T3 m6;
+g00 x6.5 y7;
+s916 m3;
+g1 g41 x12 y5 d1 f50;
+y9;
+x8 y12;
+g1 x5;
+x1 y9;
+g1 y5;
+x5 y2;
+g1 x8;
+x12 y5;
+g40 g1 x6.5 y7;
+m30;
+(PROGRAM 3 END);
+%

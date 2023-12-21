@@ -1,0 +1,19 @@
+%
+(Valid PROGRAM 4 creates a "S" curve clockwise);
+T3 m6;
+g00 x0 y3;
+s916 m3;
+g1 z-.25 f25;
+g41 g1 x3 y3 d1 f50;
+x6;
+g3 y5 j1 (find point 6, 3.5);
+g2 y7 j1 (find point 6, 7.5);
+g1 x7;
+g2 x8 y6 j-1;
+g1 y3;
+x6 y1;
+x1;
+x3 y3;
+g1 g40 x1 y3;
+m30;
+%    

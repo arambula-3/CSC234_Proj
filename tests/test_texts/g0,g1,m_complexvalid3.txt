@@ -1,0 +1,17 @@
+%
+(Advanced Sequential Drilling and Cutting);
+M06 T3 (Change to tool 3 for drilling);
+M03 S1500 (Start spindle at 1500 RPM);
+G0 X0 Y0 (Move to the first drilling position);
+G1 Z-15 F300 (Drill first hole);
+G0 Z5 (Retract to a safe height);
+G0 X30 Y0 (Move to the next position);
+G1 Z-15 F300 (Drill second hole);
+G0 Z5 (Retract to a safe height);
+M05 (Stop spindle);
+M06 T1 (Change to tool 1);
+M03 S1000 (Start spindle at 1000 RPM);
+G1 X30 Y30 F400 (Cut to X30 Y30);
+G1 X0 Y30 (Cut to X0 Y30);
+M05 (Stop spindle);
+%

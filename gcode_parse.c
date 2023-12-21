@@ -162,8 +162,8 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
                     break;
                 }
             }
-
         }
+
         if(!feedrate_given) {
             if(strcmp(feed_rate, "n/a") == 0){
                 printf("Error: feed rate not given for g1 command \n");
@@ -206,6 +206,7 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
             } else if ((*coords[i] == 90) || (*coords[i] == 122)) {
                 check = 1;
                 track = 2;
+            //Check that feedrate is passed in
             } else if ((*coords[i] == 70) || (*coords[i] == 102)) {
                 check = 1;
                 track = 3;

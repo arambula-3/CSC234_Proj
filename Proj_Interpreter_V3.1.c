@@ -9,9 +9,9 @@
 #include "error_printer.h"
 #include "rest_token_creator.h"
 #include "mcode_parse.h"
-#include "num_check.h"
+#include "gcode_parse.h"
 
-int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *fp);
+//int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *fp);
 
 char recent_gcode[BUFFERSIZE] = "n/a";
 char previous_gcode[BUFFERSIZE] = "n/a";
@@ -45,7 +45,7 @@ int main(void)
     int count = 0;
 
     //Will need to change file path to your own local temporary text test file
-    ptr = fopen("../M_Test_Cases.txt", "r");
+    ptr = fopen("../temp_test6.txt", "r");
 
     //output text filepath
     char *filename = "../output.txt";
@@ -249,7 +249,12 @@ int main(void)
                 int len = index;
                 index = 0;
 
-                int check = gcode_parse(gcode, rest_token, len, g41_42_check, fp);
+                int check = gcode_parse(gcode, rest_token, len, g41_42_check, fp,
+                d_len2, comp_count, x_pos, y_pos, z_pos, x_pos2,
+                feed_rate, cutter_comp_direction, i_pos, j_pos, k_pos,
+                r_pos, recent_gcode, prev_x_pos, prev_y_pos,
+                x_comp_pos, y_comp_pos, prev_x_pos2, prev_y_pos2,
+                previous_gcode);
                 //Check to see if commands followed proper syntax and form
                 //If not stop and print error
                 if (check == 0) {
@@ -778,7 +783,12 @@ int main(void)
 
                 int len = index;
                 index = 0;
-                int check = gcode_parse(recent_gcode, rest_token, len, g41_42_check, fp);
+                int check = gcode_parse(recent_gcode, rest_token, len, g41_42_check, fp,
+                d_len2, comp_count, x_pos, y_pos, z_pos, x_pos2,
+                feed_rate, cutter_comp_direction, i_pos, j_pos, k_pos,
+                r_pos, recent_gcode, prev_x_pos, prev_y_pos,
+                x_comp_pos, y_comp_pos, prev_x_pos2, prev_y_pos2,
+                previous_gcode);
                 //Check to see if commands followed proper syntax and form
                 //If not stop and print error
                 if (check == 0) {
@@ -869,7 +879,7 @@ int main(void)
     return 0;
 }
 
-void cutter_compensation_validate(char *cutter_comp_direction, int comp_count) {
+/*void cutter_compensation_validate(char *cutter_comp_direction, int comp_count) {
     printf("cutter comp direction = %s\n", cutter_comp_direction);
     printf("comp count = %d\n", comp_count);
     if (comp_count > 0){// && strcmp(recent_gcode, "G40") != 0) {
@@ -1174,11 +1184,9 @@ void cutter_compensation_validate(char *cutter_comp_direction, int comp_count) {
     } else if (comp_count == -1) {
         float x_comp = (d_len2/2) * sin(45 * (M_PI/180));
         float y_comp = sqrt(((d_len2/2) * (d_len2/2)) - x_comp * x_comp); 
-        printf("here\n");
         //for point at bottom of slant/arc move to bottom left or coming from horizontal line (clockwise)
         if (atof(prev_x_pos) < atof(prev_x_pos2) && atof(prev_y_pos) <= atof(prev_y_pos2) && 
             strcmp(cutter_comp_direction, "left") == 0) {
-            printf("inside\n");
             x_comp_pos = atof(prev_x_pos) + x_comp;
             y_comp_pos = atof(prev_y_pos) - y_comp;
         //for point at top of slant/arc move to top left or coming from vertical line (clockwise)
@@ -1218,10 +1226,10 @@ void cutter_compensation_validate(char *cutter_comp_direction, int comp_count) {
             y_comp_pos = atof(prev_y_pos) - y_comp;
         }
     }
-}
+}*/
 
 // Assuming you have an enum to represent the planes
-typedef enum {
+/*typedef enum {
     XY_PLANE = 0,
     XZ_PLANE,
     YZ_PLANE
@@ -1823,4 +1831,4 @@ int gcode_parse(char *gcode, char *coords[], int len, int diameter_seen, FILE *f
         comp_count = comp_count + 1;
     }
     return check;
-}
+}*/

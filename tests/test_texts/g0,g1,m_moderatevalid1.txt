@@ -1,0 +1,9 @@
+%
+(Rectangle with Tool Change);
+M06 T2 (Change to tool 2);
+G0 X0 Y0 (Move to the origin);
+G1 X50 Y0 F1500 (Cut to X50 Y0);
+G1 X50 Y50 (Cut to X50 Y50);
+G1 X0 Y50 (Cut to X0 Y50);
+G1 X0 Y0 (Complete the rectangle);
+%

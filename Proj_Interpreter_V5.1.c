@@ -38,14 +38,22 @@ char spindle_speed[BUFFERSIZE] = "n/a";
 int comp_count = 0;
 char cutter_comp_direction[BUFFERSIZE] = "n/a";
 
-int main(void)
+int interpreter(int argc, char *argv[]);
+
+int interpreter(int argc, char *argv[])
 {
     FILE* ptr;
     char buffer[BUFFERSIZE];
     int count = 0;
 
-    //change file path to your own local text test file
-    ptr = fopen("../temp_test4.txt", "r");
+    if ( argc != 2 ) /* argc should be 2 for correct execution */
+    {
+        printf("The only argument that should be given to the program is a file name.\n");
+    }
+
+    //change file path to your own local text test file//
+    ptr = fopen(argv[1], "r");
+    ////////////////////////////////////////////////////
 
     //output text filepath
     char *filename = "../output.txt";

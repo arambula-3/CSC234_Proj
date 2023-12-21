@@ -1,0 +1,8 @@
+%
+(Tool Change and Move);
+M06 T1 (Change to tool 1);
+G0 X0 Y0 (Move to the origin);
+M03 S1200 (Start spindle at 1200 RPM);
+G1 X50 Y0 F1500 (Cut a line to X50 Y0);
+M05 (Stop spindle);
+%

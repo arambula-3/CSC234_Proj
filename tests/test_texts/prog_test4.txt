@@ -1,0 +1,11 @@
+%
+(Valid PROGRAM 6 creates a circle counterclockwise);
+T3 m6;
+g00 x1 y1;
+s916 m3;
+g1 z-.25 f25; 
+g42 g1 x4 d1 f50 (find point 4,.5);
+g3 j1.5;
+g1 g40 x8;
+m30;
+%  

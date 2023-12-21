@@ -1,0 +1,8 @@
+%
+G0 X0 Y0;
+G41 D1 x5;
+G1 X100 Y0 (feed rate not given);
+G0 X200 Y200;
+G40 x4;
+M05;
+%

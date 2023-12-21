@@ -1,0 +1,9 @@
+%
+(tool not given while M6 or M16);
+G0 X0 Y0 (Move to the origin);
+G1 X50 Y0 f60 (Cut to X50 Y0);
+G1 X50 Y50 (Incorrectly increased feed rate mid-cut);
+G1 X0 Y50 (No feed rate specified);
+G1 X0 Y0 (Complete the rectangle);
+M06 (Change to tool 2);
+%

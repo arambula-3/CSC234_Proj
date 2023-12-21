@@ -30,7 +30,7 @@ int main(void)
     int count = 0;
 
     //Will need to change file path to your own local temporary text test file
-    ptr = fopen("../M_Test_Cases.txt", "r");
+    ptr = fopen("../temp_test2.txt", "r");
 
     //output text filepath
     char *filename = "../output.txt";

@@ -1,9 +1,0 @@
-%
-(feed rate can't be 0);
-M06 T2 (Change to tool 2);
-G0 X0 Y0 (Move to the origin);
-G1 X50 Y0 F0 (Cut to X50 Y0);
-G1 X50 Y50 (Incorrectly increased feed rate mid-cut);
-G1 X0 Y50 (No feed rate specified);
-G1 X0 Y0 (Complete the rectangle);
-%

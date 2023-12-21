@@ -1,7 +1,0 @@
-%
-G0 X0 Y0;
-G41 x1 (No D code specified error);
-G1 X100 Y0 F150;
-G40 x5;
-M05;
-%

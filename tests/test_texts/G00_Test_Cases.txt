@@ -1,0 +1,12 @@
+%
+G00 X100 Y50 Z10 (Rapid move to X=100, Y=50, Z=10 coordinates);
+G00 X-20 Y-30 (Rapid move to X=-20, Y=-30 while maintaining the current Z position);
+G00 Z25 (Rapid move to Z=25 while maintaining the current X and Y positions);
+G00 X0 Y0 Z0 (Rapid move to the home position for all axes);
+G00 X30 Y20 (Rapid move to X=30, Y=20);
+G00 X10 Y5 Z15 (Rapid move to X=10, Y=5, Z=15);
+X15 Y20 Z5 (Rapid move to X=15, Y=20, Z=5);
+(Invalid Commands);
+G00 F500 (Setting the feedrate (F) without specifying any movement coordinates, which is not meaningful);
+G00 H1 (Using an invalid command (H1) instead of specifying valid coordinates or parameters);
+%

@@ -1,0 +1,16 @@
+%
+(Invalid PROGRAM 7 house with sharp roof);
+G02 J-1 f916;
+T3 m6;
+g00 x2.5 y3;
+s916 m3;
+g1 z-.25 f25; 
+g1 g42 x1 y1 d1 f50;
+y4;
+x2.5 y6;
+x4 y4;
+y1;
+g40 x2.5 y3;
+g0 z0;
+m30;
+% 

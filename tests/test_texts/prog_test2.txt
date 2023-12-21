@@ -1,0 +1,19 @@
+%
+(Valid PROGRAM 2 creates a square clockwise with rounded corners);
+T3 m6;
+g00 x1 y1;
+s916 m3;
+g1 z-.25 f25;
+g1 g41 y5 d1 f50;
+y9;
+g2 x4 y12 i3;
+g1 x9;
+g2 x12 y9 j-3;
+g1 y5;
+g2 x9 y2 i-3;
+g1 x4;
+g2 x1 y5 j3;
+g1 g40 x1 y1;
+m30;
+(PROGRAM 2 END);
+%

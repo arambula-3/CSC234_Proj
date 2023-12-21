@@ -1,0 +1,10 @@
+%
+(Multiple Drilling Operations);
+M06 T3 (Change to tool 3 for drilling);
+G0 X0 Y0 (Move to the first drilling position);
+G1 Z-10 F300 (Drill first hole);
+G0 Z5 (Retract to a safe height);
+G0 X20 Y0 (Move to the next drilling position);
+G1 Z-10 F300 (Drill second hole);
+G0 Z5 (Retract to a safe height);
+%

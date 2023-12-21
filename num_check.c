@@ -12,8 +12,9 @@
 //return 0 if string is not a float
 int num_check(char *num_str) {
     float num;
-    int check = sscanf(num_str, "%f", &num);
-    if (check == 1) {
+    int len;
+    int check = sscanf(num_str, "%f %n", &num, &len);
+    if (check == 1 && !num_str[len]) {
         return 1;
     } else {
         return 0;

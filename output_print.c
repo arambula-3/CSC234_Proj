@@ -297,7 +297,7 @@ void output_print(FILE *fp, int comp_pos, char *recent_gcode, char *x_pos, char 
             //calculate central angle of arc
             if(prev_x_final_pos == *x_final_pos && prev_y_final_pos == *y_final_pos) {
                 central_angle = 360;
-            } else if (*y_final_pos == slope * *x_final_pos + intercept) {
+            } else if ((*y_final_pos == slope * *x_final_pos + intercept) || ((slope == -INFINITY || slope == INFINITY) && isnan(intercept))) {
                 central_angle = 180;
             } else {
                 //clockwise arc
@@ -433,7 +433,8 @@ void output_print(FILE *fp, int comp_pos, char *recent_gcode, char *x_pos, char 
             //print intermediate points
             while (index < 1000) {
                 float temp_angle = (central_angle / 1000) * index;
-                if ((strcmp(previous_gcode, "G02") == 0 || strcmp(previous_gcode, "G2") == 0) && d_len2 > 0) {
+                if (((strcmp(recent_gcode, "G02") == 0 || strcmp(recent_gcode, "G2") == 0) && (d_len2 == 0 || isnan(d_len2))) ||
+                ((strcmp(previous_gcode, "G02") == 0 || strcmp(previous_gcode, "G2") == 0) && d_len2 > 0)) {
                     temp_angle = temp_angle * -1;
                 }
                 x_inter_pos = x_arc_center + (prev_x_final_pos - x_arc_center) * cos(temp_angle * (M_PI/180)) + (y_arc_center - prev_y_final_pos) * sin(temp_angle * (M_PI/180));

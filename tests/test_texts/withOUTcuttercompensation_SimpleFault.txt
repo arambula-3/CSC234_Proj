@@ -1,0 +1,7 @@
+%
+M03 (Fault: Start without spindle speed);
+G00 X0 Y0 (Rapid move to origin);
+G01 X50 Y50 F200 (Linear move to X50, Y50);
+G02 X100 Y50 I50 J0 F150 (Faulty: Arc center incorrectly defined, may cause unexpected tool path);
+M05 (Stop spindle);
+%

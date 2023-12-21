@@ -1,6 +1,0 @@
-%
-(Move to a Point and Return);
-G0 X0 Y0 (Move to the origin);
-G1 X50 Y50 F1500 (Move to X50 Y50 at a feed rate of 1500);
-G0 X0 Y0 (Return to the origin);
-%
